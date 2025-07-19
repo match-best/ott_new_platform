@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 248 15% 10%; /* deep dark blue/purple */
+    --foreground: 0 0% 98%;
+    --card: 248 15% 14%;
+    --card-foreground: 0 0% 98%;
+    --popover: 248 15% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 312 80% 54%; /* magenta accent */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 248 15% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 248 15% 20%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 312 80% 54%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 248 15% 22%;
+    --input: 248 15% 22%;
+    --ring: 312 80% 54%;
+    --radius: 1rem;
+    --shadow: 0 4px 32px 0 rgba(80, 0, 80, 0.12);
+    --font-sans: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .dark {
+    --background: 248 15% 10%;
+    --foreground: 0 0% 98%;
+    --card: 248 15% 14%;
+    --card-foreground: 0 0% 98%;
+    --popover: 248 15% 12%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 312 80% 54%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 248 15% 18%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 248 15% 20%;
+    --muted-foreground: 0 0% 70%;
+    --accent: 312 80% 54%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 248 15% 22%;
+    --input: 248 15% 22%;
+    --ring: 312 80% 54%;
+    --shadow: 0 4px 32px 0 rgba(80, 0, 80, 0.12);
+    --font-sans: 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    font-family: var(--font-sans);
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Custom scrollbar styles */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Card and modal rounded corners and shadow */
+.rounded-xl {
+  border-radius: var(--radius);
+}
+.shadow-xl {
+  box-shadow: var(--shadow);
+}
+
+/* Modern hover effect for cards */
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 32px 0 rgba(80, 0, 80, 0.18);
+  transition: all 0.2s cubic-bezier(.4,2,.3,1);
+}
+
+/* Remove Netflix-style hover and line clamp comments */
+
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
