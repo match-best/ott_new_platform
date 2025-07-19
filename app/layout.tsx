@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import "./globals.css"
 import { Providers } from "@/components/providers"
 import { Toaster } from "@/components/ui/toaster"
+import Head from "next/head"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -20,6 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <Head>
+        <link rel="icon" type="image/png" href="/favicon.png" />
+      </Head>
       <body className={inter.className}>
         <Providers>
           {children}

@@ -38,6 +38,12 @@ async function fetchYouTubeTrailer(title: string) {
 }
 
 function mapToContentSchema(movie: any): any {
+  // Generate some fake scenes for demo
+  const scenes = [
+    { name: `Opening Scene of ${movie.Title}`, description: `The movie starts with ${movie.Plot?.slice(0, 40) || ''}...` },
+    { name: `Climax of ${movie.Title}`, description: `The climax involves ${movie.Title} and a major twist.` },
+    { name: `Finale`, description: `The ending of ${movie.Title} wraps up the story.` }
+  ];
   return {
     title: movie.Title,
     description: movie.Plot,
@@ -50,6 +56,7 @@ function mapToContentSchema(movie: any): any {
     views: Math.floor(Math.random() * 5000),
     watchTime: Math.floor(Math.random() * 100000),
     published: true,
+    scenes,
   }
 }
 
