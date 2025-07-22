@@ -24,7 +24,7 @@ export function StreamplayHero({ title, description, backgroundImage, videoId }:
       {/* Stronger Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/90 via-black/60 to-transparent" />
       {/* Content */}
-      <div className="relative z-10 container px-4 max-w-2xl">
+      <div className="relative z-10 container px-4 max-w-2xl -translate-y-8">
         <h1 className="text-5xl md:text-7xl font-bold text-white mb-4 drop-shadow-2xl">{title}</h1>
         <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed drop-shadow-lg">{description}</p>
         <div className="flex flex-col sm:flex-row gap-4">

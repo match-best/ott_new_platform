@@ -29,3 +29,10 @@ export interface Analytics {
   timestamp: Date
   watchTime?: number
 }
+
+export interface SupportPage {
+  slug: string;
+  title: string;
+  content: string;
+  updatedAt: Date;
+}

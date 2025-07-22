@@ -57,14 +57,39 @@
   * {
     @apply border-border;
     font-family: var(--font-sans);
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
+    overflow-x: hidden;
+  }
+  
+  html {
+    scroll-behavior: smooth;
   }
 }
 
-/* Custom scrollbar styles */
+/* Netflix-style ranking numbers */
+.text-stroke-white {
+  -webkit-text-stroke: 4px #ffffff;
+  text-stroke: 4px #ffffff;
+  color: transparent;
+}
+
+.ranking-number {
+  text-shadow: 
+    -2px -2px 0 #ffffff,
+    2px -2px 0 #ffffff,
+    -2px 2px 0 #ffffff,
+    2px 2px 0 #ffffff,
+    0 -2px 0 #ffffff,
+    0 2px 0 #ffffff,
+    -2px 0 0 #ffffff,
+    2px 0 0 #ffffff;
+}
+
+/* Premium Scrollbar Styles */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -74,23 +99,136 @@
   display: none;
 }
 
-/* Card and modal rounded corners and shadow */
-.rounded-xl {
-  border-radius: var(--radius);
-}
-.shadow-xl {
-  box-shadow: var(--shadow);
+/* Custom scrollbar for content areas */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
 
-/* Modern hover effect for cards */
+::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #9333ea, #ec4899);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+}
+
+/* Premium card animations and effects */
+.card-hover {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
 .card-hover:hover {
-  transform: translateY(-4px) scale(1.03);
-  box-shadow: 0 8px 32px 0 rgba(80, 0, 80, 0.18);
-  transition: all 0.2s cubic-bezier(.4,2,.3,1);
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 
+    0 25px 50px -12px rgba(139, 92, 246, 0.15),
+    0 0 0 1px rgba(139, 92, 246, 0.05);
 }
 
-/* Remove Netflix-style hover and line clamp comments */
+/* Modern glassmorphism effect */
+.glass {
+  background: rgba(30, 41, 59, 0.8);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(139, 92, 246, 0.1);
+}
 
+/* Premium gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #ffffff, #c084fc, #ec4899);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Smooth text animations */
+.text-fade-up {
+  animation: fadeUp 0.6s ease-out forwards;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced hover effects for buttons */
+.btn-premium {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-premium::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-premium:hover::before {
+  left: 100%;
+}
+
+/* Premium loading animations */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(30, 41, 59, 0.3) 25%,
+    rgba(139, 92, 246, 0.1) 50%,
+    rgba(30, 41, 59, 0.3) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Floating animation for premium elements */
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Premium focus styles */
+.focus-premium:focus {
+  outline: none;
+  box-shadow: 
+    0 0 0 2px rgba(139, 92, 246, 0.4),
+    0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* Enhanced line clamp utilities */
 .line-clamp-1 {
   overflow: hidden;
   display: -webkit-box;
@@ -110,4 +248,123 @@
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+}
+
+/* Premium backdrop blur effects */
+.backdrop-blur-premium {
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+}
+
+/* Smooth section transitions */
+.section-fade {
+  animation: sectionFade 0.8s ease-out forwards;
+}
+
+@keyframes sectionFade {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Premium scrolling indicators */
+.scroll-indicator {
+  position: relative;
+}
+
+.scroll-indicator::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #9333ea, #ec4899);
+  animation: scrollProgress 1s ease-out forwards;
+}
+
+@keyframes scrollProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+/* Enhanced transitions for route changes */
+.page-transition {
+  animation: pageTransition 0.5s ease-in-out;
+}
+
+@keyframes pageTransition {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Premium glow effects */
+.glow-purple {
+  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+.glow-pink {
+  box-shadow: 0 0 20px rgba(236, 72, 153, 0.3);
+}
+
+/* Smooth content loading */
+.content-appear {
+  animation: contentAppear 0.6s ease-out forwards;
+}
+
+@keyframes contentAppear {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Responsive typography improvements */
+@media (max-width: 768px) {
+  .responsive-text-lg {
+    font-size: 1rem;
+    line-height: 1.5rem;
+  }
+  
+  .responsive-text-xl {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+  }
+  
+  .responsive-text-2xl {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  
+  /* Mobile ranking numbers */
+  .ranking-number {
+    font-size: 3rem !important;
+  }
+}
+
+/* Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
 }
