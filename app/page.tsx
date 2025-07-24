@@ -5,12 +5,15 @@ import { StreamplayHero } from "@/components/netflix-hero"
 import { StreamplayRow } from "@/components/netflix-row"
 import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
-import { Search, Home, Film, Tv, Trophy, Baby, Newspaper, Star, ChevronLeft, ChevronRight, Play, TrendingUp, Award } from "lucide-react"
+import { Search, Home, Film, Tv, Trophy, Baby, Newspaper, Star, ChevronLeft, ChevronRight, Play, TrendingUp, Award, CheckCircle, LogIn } from "lucide-react"
 import Fuse from "fuse.js"
 import { HeroCarousel } from "@/components/hero-carousel"
 import { PlatformRow } from "@/components/platform-row"
 import Link from "next/link"
 import { ContentCard } from "@/components/content-card"
+import { TrendingBadge } from "@/components/trending-badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
 
 export default function HomePage() {
   const [content, setContent] = useState<any[]>([])
@@ -18,6 +21,13 @@ export default function HomePage() {
   const [dbName, setDbName] = useState<string>("")
   const [searchTerm, setSearchTerm] = useState("")
   const [isContentLoaded, setIsContentLoaded] = useState(false)
+  const [showLogin, setShowLogin] = useState(true)
+  const [showSubscribe, setShowSubscribe] = useState(false)
+  const [showPayment, setShowPayment] = useState(false)
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [subscribed, setSubscribed] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [loginTab, setLoginTab] = useState<'login' | 'signup'>("login")
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -27,9 +37,21 @@ export default function HomePage() {
         const data = await res.json()
         console.log("API DATA:", data)
         
+        // Check if the response contains an error
+        if (data.error) {
+          console.error("API Error:", data.error)
+          setContent([])
+          setIsContentLoaded(true)
+          setLoading(false)
+          return
+        }
+        
+        // Ensure data is an array
+        const contentArray = Array.isArray(data) ? data : []
+        
         // Simulate a small delay for smooth loading
         setTimeout(() => {
-          setContent(data)
+          setContent(contentArray)
           setIsContentLoaded(true)
           setLoading(false)
           const dbHeader = res.headers.get("x-db-used")
@@ -37,12 +59,23 @@ export default function HomePage() {
         }, 500)
       } catch (error) {
         console.error("Error fetching content:", error)
+        setContent([])
         setLoading(false)
       }
     }
     
     fetchContent()
   }, [])
+
+  // Hide scroll and header when modal is open
+  useEffect(() => {
+    if (showLogin || showSubscribe) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [showLogin, showSubscribe])
 
   if (loading || !isContentLoaded) {
     return (
@@ -63,14 +96,17 @@ export default function HomePage() {
     )
   }
 
+  // Ensure content is always an array
+  const safeContent = Array.isArray(content) ? content : []
+  
   // Fuzzy search setup
-  const fuse = new Fuse(content, {
+  const fuse = new Fuse(safeContent, {
     keys: ["title", "description", "scenes.name", "scenes.description"],
     threshold: 0.4, // typo-tolerant
   })
   const filteredContent = searchTerm
     ? fuse.search(searchTerm).map((result) => result.item)
-    : content
+    : safeContent
   const featuredContentList = filteredContent.filter((c) => c.featured)
   const trendingNow = filteredContent.filter((c) => c.trending).slice(0, 10) // Limit to top 10
   const popularMovies = filteredContent.filter((c) => c.popular && c.type === "movie")
@@ -87,64 +123,149 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black page-transition">
-      {/* Premium Header */}
-      <header className="fixed top-0 w-full z-50 bg-slate-950/98 backdrop-blur-xl border-b border-slate-800/50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex items-center justify-between flex-nowrap py-4 min-w-0 overflow-hidden">
-            {/* Logo Section */}
-            <div className="flex items-center space-x-8 flex-shrink-0 min-w-0">
-              <div className="flex items-center space-x-4 flex-shrink-0 min-w-0">
-                <div className="w-14 h-14 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                  <div className="w-7 h-7 bg-white rounded-lg opacity-95"></div>
-                </div>
-                <div className="min-w-0">
-                  <h1 className="text-2xl font-bold text-white tracking-tight whitespace-nowrap overflow-hidden text-ellipsis bg-gradient-to-r from-white to-purple-100 bg-clip-text">StreamPlay</h1>
-                  <p className="text-sm text-purple-300 -mt-1 font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Binge</p>
-                </div>
-              </div>
-              
-              {/* Premium Navigation */}
-              <nav className="hidden lg:flex items-center space-x-1 flex-shrink-0 min-w-0">
-                {[
-                  { icon: Home, label: "Home", href: "/", active: true },
-                  { icon: Film, label: "Movies", href: "/movies" },
-                  { icon: Tv, label: "TV Shows", href: "/series" },
-                  { icon: Trophy, label: "Sports", href: "#" },
-                  { icon: Baby, label: "Kids", href: "#" },
-                  { icon: Newspaper, label: "News", href: "#" }
-                ].map(({ icon: Icon, label, href, active }) => (
-                  <Link
-                    key={label}
-                    href={href}
-                    className={`flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-300 ${
-                      active 
-                        ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/25' 
-                        : 'text-gray-300 hover:text-white hover:bg-slate-800/70'
-                    }`}
-                  >
-                    <Icon size={18} />
-                    <span className="text-sm font-semibold">{label}</span>
-                  </Link>
-                ))}
-              </nav>
+      {/* Fullscreen Login/Signup Modal */}
+      {showLogin && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black/90 animate-fadeInUp">
+          <div className="w-full max-w-md mx-auto rounded-2xl p-10 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 shadow-2xl relative animate-fadeInUp">
+            <button className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl" onClick={() => setShowLogin(false)}>&times;</button>
+            <div className="flex justify-center mb-6">
+              <LogIn className="w-10 h-10 text-purple-400" />
             </div>
+            <div className="flex justify-center mb-6">
+              <button className={`px-6 py-2 rounded-l-lg font-bold text-lg ${loginTab==='login' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-gray-400'}`} onClick={()=>setLoginTab('login')}>Login</button>
+              <button className={`px-6 py-2 rounded-r-lg font-bold text-lg ${loginTab==='signup' ? 'bg-pink-600 text-white' : 'bg-slate-800 text-gray-400'}`} onClick={()=>setLoginTab('signup')}>Sign Up</button>
+            </div>
+            <form onSubmit={e => { e.preventDefault(); setShowLogin(false) }} className="space-y-5">
+              <input type="email" required placeholder="Email" className="w-full px-5 py-4 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg" />
+              <input type="password" required placeholder="Password" className="w-full px-5 py-4 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg" />
+              {loginTab==='signup' && (
+                <input type="text" required placeholder="Full Name" className="w-full px-5 py-4 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-pink-500 text-lg" />
+              )}
+              <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all text-lg shadow-lg">{loginTab==='login' ? 'Login' : 'Sign Up'}</Button>
+              <div className="text-center text-gray-400 text-base">or</div>
+              <Button type="button" className="w-full bg-slate-700 text-white font-bold py-4 rounded-lg hover:bg-slate-600 transition-all text-lg" onClick={() => setShowLogin(false)}>Continue as Guest</Button>
+            </form>
+          </div>
+        </div>
+      )}
 
-            {/* Search & Actions */}
-            <div className="flex items-center space-x-5 flex-shrink-0 min-w-0">
-              <div className="relative hidden md:block">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search movies, shows & more..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 pr-6 py-3.5 bg-slate-800/90 border border-slate-600/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-64 transition-all placeholder-gray-400 text-white"
-                />
-              </div>
+      {/* Fullscreen Subscribe Modal */}
+      {showSubscribe && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black/90 animate-fadeInUp">
+          <div className="w-full max-w-3xl mx-auto rounded-2xl p-10 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 shadow-2xl relative animate-fadeInUp">
+            <button className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl" onClick={() => setShowSubscribe(false)}>&times;</button>
+            <h2 className="text-3xl font-bold text-white mb-8 text-center">Choose Your Subscription</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                { name: "Basic", price: "₹99/mo", features: ["SD Quality", "1 Device", "Watch on mobile only"], color: "from-gray-700 to-gray-900" },
+                { name: "Standard", price: "₹199/mo", features: ["HD Quality", "2 Devices", "Watch on TV & Mobile"], color: "from-purple-600 to-pink-600" },
+                { name: "Premium", price: "₹299/mo", features: ["Ultra HD", "4 Devices", "All device support", "Priority Support"], color: "from-yellow-400 to-pink-500" },
+              ].map(plan => (
+                <div key={plan.name} className={`relative rounded-2xl p-8 bg-gradient-to-br ${plan.color} border-4 transition-all cursor-pointer shadow-xl ${selectedPlan === plan.name ? "border-green-400 scale-105" : "border-transparent hover:scale-105"}`} onClick={() => setSelectedPlan(plan.name)}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="text-2xl font-bold text-white">{plan.name}</div>
+                    {selectedPlan === plan.name && <CheckCircle className="w-8 h-8 text-green-400 animate-bounce" />}
+                  </div>
+                  <div className="text-3xl font-extrabold text-white mb-4">{plan.price}</div>
+                  <ul className="text-white/90 text-lg space-y-2 mb-4">
+                    {plan.features.map(f => <li key={f} className="flex items-center gap-2">{selectedPlan === plan.name ? <CheckCircle className="w-5 h-5 text-green-400" /> : <span className="inline-block w-5" />} {f}</li>)}
+                  </ul>
+                  <Button className={`w-full mt-2 py-3 rounded-xl text-lg font-bold ${selectedPlan === plan.name ? 'bg-green-500' : 'bg-black/40 hover:bg-black/60 text-white'}`} onClick={() => { setShowPayment(true); setSelectedPlan(plan.name) }}>Subscribe</Button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
-      </header>
+      )}
+
+      {/* Payment Modal (centered, not fullscreen) */}
+      <Dialog open={showPayment} onOpenChange={setShowPayment}>
+        <DialogContent className="max-w-md mx-auto rounded-2xl p-8 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 shadow-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-white mb-2">Payment</DialogTitle>
+            <p className="text-gray-400 mb-4">Complete your payment for <span className="text-pink-400 font-semibold">{selectedPlan}</span> plan</p>
+          </DialogHeader>
+          <form onSubmit={e => { e.preventDefault(); setShowPayment(false); setShowSubscribe(false); setSubscribed(true); setShowSuccess(true); setTimeout(() => setShowSuccess(false), 2000) }} className="space-y-4">
+            <input type="text" required placeholder="Card Number" className="w-full px-4 py-3 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            <div className="flex gap-2">
+              <input type="text" required placeholder="MM/YY" className="w-1/2 px-4 py-3 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+              <input type="text" required placeholder="CVV" className="w-1/2 px-4 py-3 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+            </div>
+            <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all">Pay & Subscribe</Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Success Toast */}
+      {showSuccess && (
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-3 rounded-xl shadow-2xl text-lg font-bold animate-bounce">Subscription Successful!</div>
+      )}
+
+      {/* Premium Header */}
+      {!(showLogin || showSubscribe) && (
+        <header className="fixed top-0 w-full z-50 bg-slate-950/98 backdrop-blur-xl border-b border-slate-800/50">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex items-center justify-between flex-nowrap py-4 min-w-0 overflow-hidden">
+              {/* Logo Section */}
+              <div className="flex items-center space-x-8 flex-shrink-0 min-w-0">
+                <div className="flex items-center space-x-4 flex-shrink-0 min-w-0">
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 rounded-2xl flex items-center justify-center shadow-2xl">
+                    <div className="w-7 h-7 bg-white rounded-lg opacity-95"></div>
+                  </div>
+                  <div className="min-w-0">
+                    <h1 className="text-2xl font-bold text-white tracking-tight whitespace-nowrap overflow-hidden text-ellipsis bg-gradient-to-r from-white to-purple-100 bg-clip-text">StreamPlay</h1>
+                    <p className="text-sm text-purple-300 -mt-1 font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Binge</p>
+                  </div>
+                </div>
+                
+                {/* Premium Navigation */}
+                <nav className="hidden lg:flex items-center space-x-1 flex-shrink-0 min-w-0">
+                  {[
+                    { icon: Home, label: "Home", href: "/", active: true },
+                    { icon: Film, label: "Movies", href: "/movies" },
+                    { icon: Tv, label: "TV Shows", href: "/series" },
+                    { icon: Trophy, label: "Sports", href: "#" },
+                    { icon: Baby, label: "Kids", href: "#" },
+                    { icon: Newspaper, label: "News", href: "#" }
+                  ].map(({ icon: Icon, label, href, active }) => (
+                    <Link
+                      key={label}
+                      href={href}
+                      className={`flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-300 ${
+                        active 
+                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/25' 
+                          : 'text-gray-300 hover:text-white hover:bg-slate-800/70'
+                      }`}
+                    >
+                      <Icon size={18} />
+                      <span className="text-sm font-semibold">{label}</span>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+              {/* Subscribe Button in Header */}
+              {!subscribed && (
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-7 py-3 rounded-xl text-base shadow-xl shadow-purple-500/25 transition-all duration-300 transform hover:scale-105" onClick={() => setShowSubscribe(true)}>
+                  Subscribe
+                </Button>
+              )}
+              {/* Search & Actions */}
+              <div className="flex items-center space-x-5 flex-shrink-0 min-w-0">
+                <div className="relative hidden md:block">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search movies, shows & more..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-12 pr-6 py-3.5 bg-slate-800/90 border border-slate-600/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-64 transition-all placeholder-gray-400 text-white"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+      )}
 
       {/* Hero Section */}
       <div className="pt-28 pb-8">
@@ -169,7 +290,7 @@ export default function HomePage() {
       {searchTerm ? (
         filteredContent.length > 0 ? (
           <div className="max-w-7xl mx-auto px-6 section-fade">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6 py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-5">
               {filteredContent.map((item) => (
                 <ContentCard key={item._id} content={item} />
               ))}
@@ -179,9 +300,9 @@ export default function HomePage() {
           <div className="text-center py-24 text-gray-400 text-xl">No results found for "{searchTerm}"</div>
         )
       ) : (
-        <div className="relative z-10 space-y-16 pb-20">
+        <div className="relative z-10 space-y-118 pb-16">
                     {trendingNow.length > 0 && (
-            <div className="space-y-8 section-fade">
+            <div className="space-y-2 section-fade">
               <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
                 <div className="flex items-center space-x-4">
                   <div className="w-1 h-8 bg-gradient-to-b from-red-500 to-pink-500 rounded-full"></div>
@@ -199,25 +320,13 @@ export default function HomePage() {
       >
         <ChevronLeft className="w-6 h-6" />
       </button>
-                      <div id="trending-grid" className="overflow-x-auto flex gap-6 px-16 pb-4 scrollbar-hide">
+                      <div id="trending-grid" className="overflow-x-auto flex gap-3 px-10 pb-6 scrollbar-hide">
                   {trendingNow.map((item, index) => (
-                    <div className="min-w-[240px] max-w-[260px] flex-shrink-0 relative" key={item._id}>
-                      <ContentCard content={item} />
-                      {/* Netflix-style ranking number */}
-                      <div className="absolute -top-2 -left-2 z-20">
-                        <div className="relative">
-                          {/* Large number with stroke effect */}
-                          <div className="text-8xl font-black text-red-600 leading-none select-none ranking-number">
-                            {index + 1}
-                          </div>
-                          {/* TOP badge for top 3 */}
-                          {index < 3 && (
-                            <div className="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded-full shadow-lg">
-                              TOP
-                            </div>
-                          )}
-                        </div>
+                    <div key={item._id} className="min-w-[200px] max-w-[220px] flex-shrink-0 relative group/trending">
+                      <div className="relative z-0 transition-transform duration-300 group-hover/trending:scale-105">
+                        <ContentCard content={item} />
                       </div>
+                      <TrendingBadge number={index + 1} />
                     </div>
                   ))}
       </div>
@@ -233,7 +342,7 @@ export default function HomePage() {
 )}
 
           {popularMovies.length > 0 && (
-            <div className="space-y-8 section-fade">
+            <div className="space-y-2 section-fade">
               <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
                 <div className="flex items-center space-x-4">
                   <div className="w-1 h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></div>
@@ -252,7 +361,7 @@ export default function HomePage() {
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
-                <div id="popular-grid" className="overflow-x-auto flex gap-6 px-16 pb-4 scrollbar-hide">
+                <div id="popular-grid" className="overflow-x-auto flex gap-4 px-10 pb-3 scrollbar-hide">
                   {popularMovies.map((item) => (
                     <div className="min-w-[240px] max-w-[260px] flex-shrink-0" key={item._id}>
                       <ContentCard content={item} />
@@ -271,7 +380,7 @@ export default function HomePage() {
           )}
 
           {topSeries.length > 0 && (
-            <div className="space-y-8 section-fade">
+            <div className="space-y-2 section-fade">
               <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
                 <div className="flex items-center space-x-4">
                   <div className="w-1 h-8 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full"></div>
@@ -290,7 +399,7 @@ export default function HomePage() {
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
-                <div id="topseries-grid" className="overflow-x-auto flex gap-6 px-16 pb-4 scrollbar-hide">
+                <div id="topseries-grid" className="overflow-x-auto flex gap-4 px-10 pb-3 scrollbar-hide">
                   {topSeries.map((item) => (
                     <div className="min-w-[240px] max-w-[260px] flex-shrink-0" key={item._id}>
                       <ContentCard content={item} />
@@ -309,7 +418,7 @@ export default function HomePage() {
           )}
 
           {/* Action Movies */}
-          <div className="space-y-8 section-fade">
+          <div className="space-y-4 section-fade">
             <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
               <div className="flex items-center space-x-4">
                 <div className="w-1 h-8 bg-gradient-to-b from-red-500 to-pink-500 rounded-full"></div>
@@ -328,7 +437,7 @@ export default function HomePage() {
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              <div id="action-grid" className="overflow-x-auto flex gap-6 px-16 pb-4 scrollbar-hide">
+              <div id="action-grid" className="overflow-x-auto flex gap-4 px-10 pb-3 scrollbar-hide">
                 {filteredContent.filter((c) => c.genre && Array.isArray(c.genre) && c.genre.includes("Action")).map((item) => (
                   <div className="min-w-[240px] max-w-[260px] flex-shrink-0" key={item._id}>
                     <ContentCard content={item} />
@@ -346,7 +455,7 @@ export default function HomePage() {
           </div>
 
           {/* Drama Series */}
-          <div className="space-y-8 section-fade">
+          <div className="space-y-4 section-fade">
             <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
               <div className="flex items-center space-x-4">
                 <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></div>
@@ -365,7 +474,7 @@ export default function HomePage() {
               >
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              <div id="drama-grid" className="overflow-x-auto flex gap-6 px-16 pb-4 scrollbar-hide">
+              <div id="drama-grid" className="overflow-x-auto flex gap-4 px-10 pb-3 scrollbar-hide">
                 {filteredContent.filter((c) => c.genre && Array.isArray(c.genre) && c.genre.includes("Drama") && c.type === "series").map((item) => (
                   <div className="min-w-[240px] max-w-[260px] flex-shrink-0" key={item._id}>
                     <ContentCard content={item} />
@@ -437,8 +546,7 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
+          </div> </div>
       </footer>
     </div>
   )
