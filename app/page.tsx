@@ -5,7 +5,7 @@ import { StreamplayHero } from "@/components/netflix-hero"
 import { StreamplayRow } from "@/components/netflix-row"
 import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
-import { Search, Home, Film, Tv, Trophy, Baby, Newspaper, Star, ChevronLeft, ChevronRight, Play, TrendingUp, Award, CheckCircle, LogIn } from "lucide-react"
+import { Search, Home, Film, Tv, Trophy, Baby, Newspaper, Star, ChevronLeft, ChevronRight, Play, TrendingUp, Award, CheckCircle, LogIn, Menu, X, User, Settings, LogOut, Crown, Sparkles } from "lucide-react"
 import Fuse from "fuse.js"
 import { HeroCarousel } from "@/components/hero-carousel"
 import { PlatformRow } from "@/components/platform-row"
@@ -14,6 +14,8 @@ import { ContentCard } from "@/components/content-card"
 import { TrendingBadge } from "@/components/trending-badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
+import { AIAvatar } from "@/components/ai-avatar"
+import { cn } from "@/lib/utils"
 
 export default function HomePage() {
   const [content, setContent] = useState<any[]>([])
@@ -28,6 +30,9 @@ export default function HomePage() {
   const [subscribed, setSubscribed] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
   const [loginTab, setLoginTab] = useState<'login' | 'signup'>("login")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [showUserMenu, setShowUserMenu] = useState(false)
 
   useEffect(() => {
     const fetchContent = async () => {
@@ -82,7 +87,7 @@ export default function HomePage() {
       <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black flex items-center justify-center">
         <div className="text-center">
           <div className="w-20 h-20 bg-gradient-to-r from-purple-600 via-pink-600 to-red-600 rounded-2xl animate-pulse mx-auto mb-8 flex items-center justify-center shadow-2xl">
-            <div className="w-10 h-10 bg-white rounded-xl opacity-90"></div>
+            <Sparkles className="w-10 h-10 text-white animate-pulse" />
           </div>
           <div className="text-white text-3xl font-bold mb-3 tracking-wide">StreamPlay Binge</div>
           <div className="text-purple-300 text-lg mb-6">Loading premium content...</div>
@@ -116,7 +121,7 @@ export default function HomePage() {
   function scrollGrid(containerId: string, direction: 'left' | 'right') {
     const container = document.getElementById(containerId);
     if (container) {
-      const scrollAmount = 400;
+      const scrollAmount = window.innerWidth < 768 ? 250 : 400;
       container.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
     }
   }
@@ -125,25 +130,87 @@ export default function HomePage() {
     <div className="min-h-screen bg-gradient-to-b from-slate-950 via-slate-900 to-black page-transition">
       {/* Fullscreen Login/Signup Modal */}
       {showLogin && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black/90 animate-fadeInUp">
-          <div className="w-full max-w-md mx-auto rounded-2xl p-10 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 shadow-2xl relative animate-fadeInUp">
-            <button className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl" onClick={() => setShowLogin(false)}>&times;</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black/95 animate-fadeInUp px-4">
+          <div className="w-full max-w-md mx-auto rounded-3xl p-8 md:p-10 bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl relative animate-fadeInUp">
+            <button 
+              className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl transition-colors p-2" 
+              onClick={() => setShowLogin(false)}
+            >
+              <X className="w-6 h-6" />
+            </button>
             <div className="flex justify-center mb-6">
-              <LogIn className="w-10 h-10 text-purple-400" />
+              <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg">
+                <LogIn className="w-8 h-8 text-white" />
+              </div>
             </div>
             <div className="flex justify-center mb-6">
-              <button className={`px-6 py-2 rounded-l-lg font-bold text-lg ${loginTab==='login' ? 'bg-purple-600 text-white' : 'bg-slate-800 text-gray-400'}`} onClick={()=>setLoginTab('login')}>Login</button>
-              <button className={`px-6 py-2 rounded-r-lg font-bold text-lg ${loginTab==='signup' ? 'bg-pink-600 text-white' : 'bg-slate-800 text-gray-400'}`} onClick={()=>setLoginTab('signup')}>Sign Up</button>
+              <div className="bg-slate-800/50 rounded-xl p-1 flex">
+                <button 
+                  className={cn(
+                    "px-6 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300",
+                    loginTab === 'login' 
+                      ? 'bg-gradient-to-r from-purple-600 to-purple-700 text-white shadow-lg' 
+                      : 'text-gray-400 hover:text-white'
+                  )}
+                  onClick={() => setLoginTab('login')}
+                >
+                  Login
+                </button>
+                <button 
+                  className={cn(
+                    "px-6 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300",
+                    loginTab === 'signup' 
+                      ? 'bg-gradient-to-r from-pink-600 to-pink-700 text-white shadow-lg' 
+                      : 'text-gray-400 hover:text-white'
+                  )}
+                  onClick={() => setLoginTab('signup')}
+                >
+                  Sign Up
+                </button>
+              </div>
             </div>
-            <form onSubmit={e => { e.preventDefault(); setShowLogin(false) }} className="space-y-5">
-              <input type="email" required placeholder="Email" className="w-full px-5 py-4 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg" />
-              <input type="password" required placeholder="Password" className="w-full px-5 py-4 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500 text-lg" />
-              {loginTab==='signup' && (
-                <input type="text" required placeholder="Full Name" className="w-full px-5 py-4 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-pink-500 text-lg" />
+            <form onSubmit={e => { e.preventDefault(); setShowLogin(false) }} className="space-y-4">
+              <input 
+                type="email" 
+                required 
+                placeholder="Email address" 
+                className="w-full px-5 py-4 rounded-xl bg-slate-800/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base placeholder:text-gray-500 transition-all" 
+              />
+              <input 
+                type="password" 
+                required 
+                placeholder="Password" 
+                className="w-full px-5 py-4 rounded-xl bg-slate-800/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base placeholder:text-gray-500 transition-all" 
+              />
+              {loginTab === 'signup' && (
+                <input 
+                  type="text" 
+                  required 
+                  placeholder="Full Name" 
+                  className="w-full px-5 py-4 rounded-xl bg-slate-800/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent text-base placeholder:text-gray-500 transition-all" 
+                />
               )}
-              <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all text-lg shadow-lg">{loginTab==='login' ? 'Login' : 'Sign Up'}</Button>
-              <div className="text-center text-gray-400 text-base">or</div>
-              <Button type="button" className="w-full bg-slate-700 text-white font-bold py-4 rounded-lg hover:bg-slate-600 transition-all text-lg" onClick={() => setShowLogin(false)}>Continue as Guest</Button>
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-4 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all text-base shadow-lg hover:shadow-xl transform hover:scale-[1.02] duration-300"
+              >
+                {loginTab === 'login' ? 'Login' : 'Create Account'}
+              </Button>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-700/50"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-4 bg-gradient-to-br from-slate-900/95 to-slate-800/95 text-gray-400">or</span>
+                </div>
+              </div>
+              <Button 
+                type="button" 
+                className="w-full bg-slate-700/50 text-white font-semibold py-4 rounded-xl hover:bg-slate-600/50 transition-all text-base border border-slate-600/50 hover:border-slate-500/50" 
+                onClick={() => setShowLogin(false)}
+              >
+                Continue as Guest
+              </Button>
             </form>
           </div>
         </div>
@@ -151,26 +218,97 @@ export default function HomePage() {
 
       {/* Fullscreen Subscribe Modal */}
       {showSubscribe && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black/90 animate-fadeInUp">
-          <div className="w-full max-w-3xl mx-auto rounded-2xl p-10 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 shadow-2xl relative animate-fadeInUp">
-            <button className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl" onClick={() => setShowSubscribe(false)}>&times;</button>
-            <h2 className="text-3xl font-bold text-white mb-8 text-center">Choose Your Subscription</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-black/95 animate-fadeInUp px-4 py-8 overflow-y-auto">
+          <div className="w-full max-w-5xl mx-auto rounded-3xl p-6 md:p-10 bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl relative animate-fadeInUp">
+            <button 
+              className="absolute top-4 right-4 text-gray-400 hover:text-white text-2xl transition-colors p-2" 
+              onClick={() => setShowSubscribe(false)}
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <h2 className="text-2xl md:text-4xl font-bold text-white mb-2 text-center">Choose Your Plan</h2>
+            <p className="text-gray-400 text-center mb-8">Unlimited entertainment, one low price</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
-                { name: "Basic", price: "₹99/mo", features: ["SD Quality", "1 Device", "Watch on mobile only"], color: "from-gray-700 to-gray-900" },
-                { name: "Standard", price: "₹199/mo", features: ["HD Quality", "2 Devices", "Watch on TV & Mobile"], color: "from-purple-600 to-pink-600" },
-                { name: "Premium", price: "₹299/mo", features: ["Ultra HD", "4 Devices", "All device support", "Priority Support"], color: "from-yellow-400 to-pink-500" },
-              ].map(plan => (
-                <div key={plan.name} className={`relative rounded-2xl p-8 bg-gradient-to-br ${plan.color} border-4 transition-all cursor-pointer shadow-xl ${selectedPlan === plan.name ? "border-green-400 scale-105" : "border-transparent hover:scale-105"}`} onClick={() => setSelectedPlan(plan.name)}>
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="text-2xl font-bold text-white">{plan.name}</div>
-                    {selectedPlan === plan.name && <CheckCircle className="w-8 h-8 text-green-400 animate-bounce" />}
+                { 
+                  name: "Basic", 
+                  price: "₹99", 
+                  period: "/month",
+                  features: ["SD Quality (480p)", "1 Device at a time", "Mobile & Tablet only", "Limited content library"], 
+                  color: "from-slate-700 to-slate-900",
+                  popular: false 
+                },
+                { 
+                  name: "Standard", 
+                  price: "₹199", 
+                  period: "/month",
+                  features: ["Full HD Quality (1080p)", "2 Devices at a time", "All devices supported", "Full content library", "Offline downloads"], 
+                  color: "from-purple-600 to-pink-600",
+                  popular: true 
+                },
+                { 
+                  name: "Premium", 
+                  price: "₹299", 
+                  period: "/month",
+                  features: ["4K + HDR Quality", "4 Devices at a time", "All devices supported", "Full content library", "Offline downloads", "Priority support"], 
+                  color: "from-gradient-to-r from-amber-500 to-pink-600",
+                  popular: false 
+                },
+              ].map((plan) => (
+                <div 
+                  key={plan.name} 
+                  className={cn(
+                    "relative rounded-2xl p-6 bg-gradient-to-br border-2 transition-all duration-300 cursor-pointer",
+                    selectedPlan === plan.name 
+                      ? "border-green-400 scale-105 shadow-2xl" 
+                      : "border-transparent hover:scale-105 hover:border-purple-500/50",
+                    plan.color
+                  )}
+                  onClick={() => setSelectedPlan(plan.name)}
+                >
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg">
+                      MOST POPULAR
+                    </div>
+                  )}
+                  <div className="flex items-start justify-between mb-4">
+                    <div>
+                      <h3 className="text-2xl font-bold text-white">{plan.name}</h3>
+                      <div className="flex items-baseline mt-2">
+                        <span className="text-4xl font-extrabold text-white">{plan.price}</span>
+                        <span className="text-gray-300 ml-1">{plan.period}</span>
+                      </div>
+                    </div>
+                    {selectedPlan === plan.name && (
+                      <CheckCircle className="w-8 h-8 text-green-400 animate-bounce" />
+                    )}
                   </div>
-                  <div className="text-3xl font-extrabold text-white mb-4">{plan.price}</div>
-                  <ul className="text-white/90 text-lg space-y-2 mb-4">
-                    {plan.features.map(f => <li key={f} className="flex items-center gap-2">{selectedPlan === plan.name ? <CheckCircle className="w-5 h-5 text-green-400" /> : <span className="inline-block w-5" />} {f}</li>)}
+                  <ul className="space-y-3 mb-6">
+                    {plan.features.map((feature) => (
+                      <li key={feature} className="flex items-start gap-3 text-gray-200">
+                        <CheckCircle className={cn(
+                          "w-5 h-5 mt-0.5 flex-shrink-0",
+                          selectedPlan === plan.name ? "text-green-400" : "text-gray-500"
+                        )} />
+                        <span className="text-sm">{feature}</span>
+                      </li>
+                    ))}
                   </ul>
-                  <Button className={`w-full mt-2 py-3 rounded-xl text-lg font-bold ${selectedPlan === plan.name ? 'bg-green-500' : 'bg-black/40 hover:bg-black/60 text-white'}`} onClick={() => { setShowPayment(true); setSelectedPlan(plan.name) }}>Subscribe</Button>
+                  <Button 
+                    className={cn(
+                      "w-full py-3 rounded-xl text-base font-semibold transition-all duration-300",
+                      selectedPlan === plan.name 
+                        ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg' 
+                        : 'bg-black/20 hover:bg-black/30 text-white border border-white/20'
+                    )}
+                    onClick={(e) => { 
+                      e.stopPropagation();
+                      setSelectedPlan(plan.name);
+                      setShowPayment(true);
+                    }}
+                  >
+                    {selectedPlan === plan.name ? 'Continue' : 'Select Plan'}
+                  </Button>
                 </div>
               ))}
             </div>
@@ -178,116 +316,258 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Payment Modal (centered, not fullscreen) */}
+      {/* Payment Modal */}
       <Dialog open={showPayment} onOpenChange={setShowPayment}>
-        <DialogContent className="max-w-md mx-auto rounded-2xl p-8 bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 shadow-2xl">
+        <DialogContent className="max-w-md mx-auto rounded-3xl p-8 bg-gradient-to-br from-slate-900/95 to-slate-800/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-white mb-2">Payment</DialogTitle>
-            <p className="text-gray-400 mb-4">Complete your payment for <span className="text-pink-400 font-semibold">{selectedPlan}</span> plan</p>
+            <DialogTitle className="text-2xl font-bold text-white mb-2">Complete Payment</DialogTitle>
+            <p className="text-gray-400 mb-4">Secure payment for <span className="text-purple-400 font-semibold">{selectedPlan}</span> plan</p>
           </DialogHeader>
-          <form onSubmit={e => { e.preventDefault(); setShowPayment(false); setShowSubscribe(false); setSubscribed(true); setShowSuccess(true); setTimeout(() => setShowSuccess(false), 2000) }} className="space-y-4">
-            <input type="text" required placeholder="Card Number" className="w-full px-4 py-3 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500" />
-            <div className="flex gap-2">
-              <input type="text" required placeholder="MM/YY" className="w-1/2 px-4 py-3 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500" />
-              <input type="text" required placeholder="CVV" className="w-1/2 px-4 py-3 rounded-lg bg-slate-800 text-white border border-slate-700 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+          <form onSubmit={e => { 
+            e.preventDefault(); 
+            setShowPayment(false); 
+            setShowSubscribe(false); 
+            setSubscribed(true); 
+            setShowSuccess(true); 
+            setTimeout(() => setShowSuccess(false), 3000) 
+          }} className="space-y-4">
+            <input 
+              type="text" 
+              required 
+              placeholder="Card Number" 
+              className="w-full px-4 py-3 rounded-xl bg-slate-800/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500 transition-all" 
+            />
+            <div className="flex gap-3">
+              <input 
+                type="text" 
+                required 
+                placeholder="MM/YY" 
+                className="w-1/2 px-4 py-3 rounded-xl bg-slate-800/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500 transition-all" 
+              />
+              <input 
+                type="text" 
+                required 
+                placeholder="CVV" 
+                className="w-1/2 px-4 py-3 rounded-xl bg-slate-800/50 text-white border border-slate-700/50 focus:outline-none focus:ring-2 focus:ring-purple-500 placeholder:text-gray-500 transition-all" 
+              />
             </div>
-            <Button type="submit" className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all">Pay & Subscribe</Button>
+            <Button 
+              type="submit" 
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 rounded-xl hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg hover:shadow-xl"
+            >
+              Pay & Subscribe
+            </Button>
           </form>
         </DialogContent>
       </Dialog>
 
       {/* Success Toast */}
       {showSuccess && (
-        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-green-600 text-white px-6 py-3 rounded-xl shadow-2xl text-lg font-bold animate-bounce">Subscription Successful!</div>
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50 bg-gradient-to-r from-green-600 to-emerald-600 text-white px-8 py-4 rounded-2xl shadow-2xl text-base font-semibold animate-bounce flex items-center gap-3">
+          <CheckCircle className="w-6 h-6" />
+          Subscription Successful! Welcome to Premium
+        </div>
       )}
 
       {/* Premium Header */}
       {!(showLogin || showSubscribe) && (
-        <header className="fixed top-0 w-full z-50 bg-slate-950/98 backdrop-blur-xl border-b border-slate-800/50">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex items-center justify-between flex-nowrap py-4 min-w-0 overflow-hidden">
-              {/* Logo Section */}
-              <div className="flex items-center space-x-8 flex-shrink-0 min-w-0">
-                <div className="flex items-center space-x-4 flex-shrink-0 min-w-0">
-                  <div className="w-14 h-14 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                    <div className="w-7 h-7 bg-white rounded-lg opacity-95"></div>
+        <header className="fixed top-0 w-full z-40 bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="flex items-center justify-between h-16 md:h-20">
+              {/* Logo & Desktop Navigation */}
+              <div className="flex items-center space-x-8">
+                {/* Logo */}
+                <Link href="/" className="flex items-center space-x-3 flex-shrink-0">
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 rounded-2xl flex items-center justify-center shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                    <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-white" />
                   </div>
-                  <div className="min-w-0">
-                    <h1 className="text-2xl font-bold text-white tracking-tight whitespace-nowrap overflow-hidden text-ellipsis bg-gradient-to-r from-white to-purple-100 bg-clip-text">StreamPlay</h1>
-                    <p className="text-sm text-purple-300 -mt-1 font-semibold whitespace-nowrap overflow-hidden text-ellipsis">Binge</p>
+                  <div className="hidden sm:block">
+                    <h1 className="text-xl md:text-2xl font-bold text-white tracking-tight">StreamPlay</h1>
+                    <p className="text-xs text-purple-300 -mt-1 font-semibold">BINGE</p>
                   </div>
-                </div>
+                </Link>
                 
-                {/* Premium Navigation */}
-                <nav className="hidden lg:flex items-center space-x-1 flex-shrink-0 min-w-0">
+                {/* Desktop Navigation */}
+                <nav className="hidden lg:flex items-center space-x-1">
                   {[
                     { icon: Home, label: "Home", href: "/", active: true },
                     { icon: Film, label: "Movies", href: "/movies" },
                     { icon: Tv, label: "TV Shows", href: "/series" },
                     { icon: Trophy, label: "Sports", href: "#" },
                     { icon: Baby, label: "Kids", href: "#" },
-                    { icon: Newspaper, label: "News", href: "#" }
                   ].map(({ icon: Icon, label, href, active }) => (
                     <Link
                       key={label}
                       href={href}
-                      className={`flex items-center space-x-2 px-5 py-3 rounded-xl transition-all duration-300 ${
+                      className={cn(
+                        "flex items-center space-x-2 px-4 py-2.5 rounded-xl transition-all duration-300",
                         active 
-                          ? 'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-2xl shadow-purple-500/25' 
-                          : 'text-gray-300 hover:text-white hover:bg-slate-800/70'
-                      }`}
+                          ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-white border border-purple-500/30' 
+                          : 'text-gray-300 hover:text-white hover:bg-slate-800/50'
+                      )}
                     >
                       <Icon size={18} />
-                      <span className="text-sm font-semibold">{label}</span>
+                      <span className="text-sm font-medium">{label}</span>
                     </Link>
                   ))}
                 </nav>
               </div>
-              {/* Subscribe Button in Header */}
-              {!subscribed && (
-                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold px-7 py-3 rounded-xl text-base shadow-xl shadow-purple-500/25 transition-all duration-300 transform hover:scale-105" onClick={() => setShowSubscribe(true)}>
-                  Subscribe
-                </Button>
-              )}
-              {/* Search & Actions */}
-              <div className="flex items-center space-x-5 flex-shrink-0 min-w-0">
-                <div className="relative hidden md:block">
+              
+              {/* Right Side Actions */}
+              <div className="flex items-center space-x-3">
+                {/* Desktop Search */}
+                <div className="hidden md:block relative">
                   <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                   <input
                     type="text"
-                    placeholder="Search movies, shows & more..."
+                    placeholder="Search movies, shows..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 pr-6 py-3.5 bg-slate-800/90 border border-slate-600/50 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-64 transition-all placeholder-gray-400 text-white"
+                    className="pl-12 pr-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-64 transition-all placeholder:text-gray-500 text-white"
+                  />
+                </div>
+                
+                {/* Mobile Search Button */}
+                <button 
+                  className="md:hidden p-2.5 rounded-xl bg-slate-800/50 text-gray-300 hover:text-white transition-colors"
+                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+                
+                {/* Subscribe/User Button */}
+                {!subscribed ? (
+                  <Button 
+                    className="hidden sm:flex bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-2.5 rounded-xl text-sm shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+                    onClick={() => setShowSubscribe(true)}
+                  >
+                    <Crown className="w-4 h-4 mr-2" />
+                    Subscribe
+                  </Button>
+                ) : (
+                  <div className="relative">
+                    <button 
+                      className="flex items-center space-x-2 p-2 md:px-4 md:py-2 rounded-xl bg-gradient-to-r from-purple-600/20 to-pink-600/20 border border-purple-500/30 hover:border-purple-400/50 transition-all"
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center">
+                        <User className="w-4 h-4 text-white" />
+                      </div>
+                      <span className="hidden md:block text-white text-sm font-medium">Premium</span>
+                    </button>
+                    
+                    {showUserMenu && (
+                      <div className="absolute right-0 mt-2 w-56 rounded-xl bg-slate-800/95 backdrop-blur-xl border border-slate-700/50 shadow-2xl py-2">
+                        <Link href="/profile" className="flex items-center space-x-3 px-4 py-3 hover:bg-slate-700/50 transition-colors">
+                          <User className="w-4 h-4 text-gray-400" />
+                          <span className="text-white text-sm">My Profile</span>
+                        </Link>
+                        <Link href="/settings" className="flex items-center space-x-3 px-4 py-3 hover:bg-slate-700/50 transition-colors">
+                          <Settings className="w-4 h-4 text-gray-400" />
+                          <span className="text-white text-sm">Settings</span>
+                        </Link>
+                        <hr className="my-2 border-slate-700/50" />
+                        <button className="flex items-center space-x-3 px-4 py-3 hover:bg-slate-700/50 transition-colors w-full text-left">
+                          <LogOut className="w-4 h-4 text-gray-400" />
+                          <span className="text-white text-sm">Sign Out</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Mobile Menu Button */}
+                <button 
+                  className="lg:hidden p-2.5 rounded-xl bg-slate-800/50 text-gray-300 hover:text-white transition-colors"
+                  onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                >
+                  {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+            
+            {/* Mobile Search Bar */}
+            {isSearchOpen && (
+              <div className="md:hidden pb-4 animate-fadeIn">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <input
+                    type="text"
+                    placeholder="Search movies, shows..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-12 pr-4 py-3 bg-slate-800/50 border border-slate-700/50 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all placeholder:text-gray-500 text-white"
                   />
                 </div>
               </div>
-            </div>
+            )}
+            
+            {/* Mobile Menu */}
+            {isMobileMenuOpen && (
+              <div className="lg:hidden absolute top-full left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-slate-800/50 animate-fadeIn">
+                <nav className="py-4 px-4 space-y-2">
+                  {[
+                    { icon: Home, label: "Home", href: "/", active: true },
+                    { icon: Film, label: "Movies", href: "/movies" },
+                    { icon: Tv, label: "TV Shows", href: "/series" },
+                    { icon: Trophy, label: "Sports", href: "#" },
+                    { icon: Baby, label: "Kids", href: "#" },
+                  ].map(({ icon: Icon, label, href, active }) => (
+                    <Link
+                      key={label}
+                      href={href}
+                      className={cn(
+                        "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all",
+                        active 
+                          ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-white' 
+                          : 'text-gray-300 hover:text-white hover:bg-slate-800/50'
+                      )}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Icon size={20} />
+                      <span className="font-medium">{label}</span>
+                    </Link>
+                  ))}
+                  {!subscribed && (
+                    <button 
+                      className="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-lg flex items-center justify-center"
+                      onClick={() => {
+                        setShowSubscribe(true);
+                        setIsMobileMenuOpen(false);
+                      }}
+                    >
+                      <Crown className="w-4 h-4 mr-2" />
+                      Subscribe Now
+                    </button>
+                  )}
+                </nav>
+              </div>
+            )}
           </div>
         </header>
       )}
 
       {/* Hero Section */}
-      <div className="pt-28 pb-8">
+      <div className="pt-20 md:pt-28 pb-8">
         {!searchTerm && featuredContentList.length > 0 && (
-          <div className="relative mb-12 section-fade">
+          <div className="relative mb-8 md:mb-12 section-fade">
             <HeroCarousel items={featuredContentList} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
           </div>
         )}
         {!searchTerm && featuredContentList.length === 0 && (
-          <div className="text-center py-20 bg-gradient-to-r from-slate-800/40 to-slate-900/40 rounded-3xl mx-6 mb-12 border border-slate-700/30 section-fade">
+          <div className="text-center py-12 md:py-20 bg-gradient-to-r from-slate-800/40 to-slate-900/40 rounded-3xl mx-4 md:mx-6 mb-8 md:mb-12 border border-slate-700/30 section-fade">
             <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl mx-auto mb-6 flex items-center justify-center">
               <Play className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-white text-3xl font-bold mb-3">No Featured Content</h2>
-            <p className="text-gray-400 text-lg">Check back soon for premium releases across all platforms</p>
+            <h2 className="text-white text-2xl md:text-3xl font-bold mb-3">No Featured Content</h2>
+            <p className="text-gray-400 text-base md:text-lg px-4">Check back soon for premium releases</p>
           </div>
         )}
       </div>
 
-      {/* Content Sections */}
-      {searchTerm ? (
+       {/* Content Sections */}
+       {searchTerm ? (
         filteredContent.length > 0 ? (
           <div className="max-w-7xl mx-auto px-6 section-fade">
             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-5">
@@ -494,60 +774,68 @@ export default function HomePage() {
       )}
 
       {/* Premium Footer */}
-      <footer className="bg-gradient-to-b from-slate-900 to-black border-t border-slate-800/50 mt-24">
-        <div className="max-w-7xl mx-auto px-6 py-16">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-            <div className="col-span-1 md:col-span-2">
-              <div className="flex items-center space-x-4 mb-8">
+      <footer className="bg-gradient-to-b from-slate-900 to-black border-t border-slate-800/50 mt-16 md:mt-24">
+        <div className="container mx-auto px-4 md:px-6 py-12 md:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+            <div className="lg:col-span-2">
+              <div className="flex items-center space-x-4 mb-6">
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-600 via-pink-600 to-red-600 rounded-2xl flex items-center justify-center shadow-2xl">
-                  <div className="w-7 h-7 bg-white rounded-lg opacity-95"></div>
+                  <Sparkles className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-white">StreamPlay Binge</h1>
+                  <h1 className="text-2xl md:text-3xl font-bold text-white">StreamPlay Binge</h1>
                   <p className="text-purple-300 text-sm font-medium">Premium streaming experience</p>
                 </div>
               </div>
-              <p className="text-gray-400 text-base leading-relaxed max-w-lg">
+              <p className="text-gray-400 text-sm md:text-base leading-relaxed max-w-lg">
                 Experience the best of entertainment with premium content from Netflix, Prime Video, Disney+ Hotstar, and more - all unified in one seamless platform.
               </p>
             </div>
             
             <div>
-              <h4 className="font-bold text-white mb-6 text-lg">Quick Links</h4>
-              <div className="space-y-4 text-base text-gray-400">
-                <p className="hover:text-purple-300 cursor-pointer transition-colors">Home</p>
-                <p className="hover:text-purple-300 cursor-pointer transition-colors">Movies</p>
-                <p className="hover:text-purple-300 cursor-pointer transition-colors">TV Shows</p>
-                <p className="hover:text-purple-300 cursor-pointer transition-colors">Sports</p>
+              <h4 className="font-bold text-white mb-4 md:mb-6 text-lg">Quick Links</h4>
+              <div className="space-y-3 text-sm md:text-base text-gray-400">
+                <Link href="/" className="block hover:text-purple-300 cursor-pointer transition-colors">Home</Link>
+                <Link href="/movies" className="block hover:text-purple-300 cursor-pointer transition-colors">Movies</Link>
+                <Link href="/series" className="block hover:text-purple-300 cursor-pointer transition-colors">TV Shows</Link>
+                <Link href="/sports" className="block hover:text-purple-300 cursor-pointer transition-colors">Sports</Link>
               </div>
             </div>
             
             <div>
-              <h4 className="font-bold text-white mb-6 text-lg">Support</h4>
-              <div className="space-y-4 text-base text-gray-400">
-                <p className="hover:text-purple-300 cursor-pointer transition-colors">Help Center</p>
-                <p className="hover:text-purple-300 cursor-pointer transition-colors">Contact Us</p>
-                <p className="hover:text-purple-300 cursor-pointer transition-colors">Privacy Policy</p>
-                <p className="hover:text-purple-300 cursor-pointer transition-colors">Terms of Service</p>
+              <h4 className="font-bold text-white mb-4 md:mb-6 text-lg">Support</h4>
+              <div className="space-y-3 text-sm md:text-base text-gray-400">
+                <Link href="/support/help-center" className="block hover:text-purple-300 cursor-pointer transition-colors">Help Center</Link>
+                <Link href="/support/contact-us" className="block hover:text-purple-300 cursor-pointer transition-colors">Contact Us</Link>
+                <Link href="/support/privacy-policy" className="block hover:text-purple-300 cursor-pointer transition-colors">Privacy Policy</Link>
+                <Link href="/support/terms-of-service" className="block hover:text-purple-300 cursor-pointer transition-colors">Terms of Service</Link>
               </div>
             </div>
           </div>
           
-          <div className="border-t border-slate-800 mt-16 pt-10 flex flex-col md:flex-row items-center justify-between">
+          <div className="border-t border-slate-800 mt-12 pt-8 flex flex-col md:flex-row items-center justify-between">
             <p className="text-gray-500 text-sm">
               © 2025 StreamPlay Binge. All rights reserved.
             </p>
-            <div className="flex items-center space-x-8 mt-6 md:mt-0">
-              <div className="flex space-x-4 text-gray-400">
+            <div className="flex items-center space-x-4 mt-6 md:mt-0">
+              <div className="flex space-x-3 text-gray-400">
                 {['facebook', 'twitter', 'instagram', 'youtube'].map((social) => (
-                  <div key={social} className="w-10 h-10 bg-slate-800 rounded-full flex items-center justify-center hover:bg-purple-600 cursor-pointer transition-all transform hover:scale-110">
-                    <span className="text-sm font-bold">{social[0].toUpperCase()}</span>
-                  </div>
+                  <a 
+                    key={social} 
+                    href={`#${social}`}
+                    className="w-10 h-10 bg-slate-800/50 rounded-full flex items-center justify-center hover:bg-gradient-to-r hover:from-purple-600 hover:to-pink-600 cursor-pointer transition-all transform hover:scale-110 border border-slate-700/50 hover:border-purple-500/50"
+                  >
+                    <span className="text-xs font-bold uppercase">{social[0]}</span>
+                  </a>
                 ))}
               </div>
             </div>
-          </div> </div>
+          </div>
+        </div>
       </footer>
+
+      {/* AI Avatar Component */}
+      <AIAvatar onSearchContent={(query: string) => setSearchTerm(query)} />
     </div>
   )
 }
