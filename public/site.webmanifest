@@ -1,0 +1,41 @@
+{
+  "name": "StreamPlay - Your Ultimate OTT Platform",
+  "short_name": "StreamPlay",
+  "description": "Watch the latest movies, TV shows, and exclusive content in HD",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#dc2626",
+  "orientation": "portrait-primary",
+  "categories": ["entertainment", "streaming", "video"],
+  "lang": "en",
+  "dir": "ltr",
+  "icons": [
+    {
+      "src": "https://uxwing.com/wp-content/themes/uxwing/download/video-photography-multimedia/red-play-button-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://uxwing.com/wp-content/themes/uxwing/download/video-photography-multimedia/red-play-button-icon.png", 
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "https://uxwing.com/wp-content/themes/uxwing/download/video-photography-multimedia/red-play-button-icon.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "StreamPlay Home Screen"
+    }
+  ],
+  "features": [
+    "Cross Platform",
+    "Fast",
+    "Simple"
+  ],
+  "prefer_related_applications": false
+} 

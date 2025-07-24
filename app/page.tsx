@@ -504,8 +504,8 @@ export default function HomePage() {
             
             {/* Mobile Menu */}
             {isMobileMenuOpen && (
-              <div className="lg:hidden absolute top-full left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-slate-800/50 animate-fadeIn">
-                <nav className="py-4 px-4 space-y-2">
+              <div className="lg:hidden absolute top-full left-0 w-full bg-slate-900/98 backdrop-blur-xl border-b border-slate-800/50 animate-fadeIn z-50 shadow-2xl">
+                <nav className="py-3 px-3 space-y-1 max-h-[80vh] overflow-y-auto">
                   {[
                     { icon: Home, label: "Home", href: "/", active: true },
                     { icon: Film, label: "Movies", href: "/movies" },
@@ -517,10 +517,10 @@ export default function HomePage() {
                       key={label}
                       href={href}
                       className={cn(
-                        "flex items-center space-x-3 px-4 py-3 rounded-xl transition-all",
+                        "flex items-center space-x-3 px-4 py-3.5 rounded-xl transition-all min-h-[48px] text-base",
                         active 
-                          ? 'bg-gradient-to-r from-purple-600/20 to-pink-600/20 text-white' 
-                          : 'text-gray-300 hover:text-white hover:bg-slate-800/50'
+                          ? 'bg-gradient-to-r from-purple-600/25 to-pink-600/25 text-white border border-purple-500/30' 
+                          : 'text-gray-300 hover:text-white hover:bg-slate-800/60 active:bg-slate-700/60'
                       )}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -530,13 +530,13 @@ export default function HomePage() {
                   ))}
                   {!subscribed && (
                     <button 
-                      className="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3 rounded-xl text-sm shadow-lg flex items-center justify-center"
+                      className="w-full mt-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-semibold px-6 py-3.5 rounded-xl text-base shadow-lg flex items-center justify-center min-h-[48px] active:scale-95 transition-transform"
                       onClick={() => {
                         setShowSubscribe(true);
                         setIsMobileMenuOpen(false);
                       }}
                     >
-                      <Crown className="w-4 h-4 mr-2" />
+                      <Crown className="w-5 h-5 mr-2" />
                       Subscribe Now
                     </button>
                   )}
@@ -548,15 +548,15 @@ export default function HomePage() {
       )}
 
       {/* Hero Section */}
-      <div className="pt-20 md:pt-28 pb-8">
+      <div className="pt-20 md:pt-24 pb-4 md:pb-6">
         {!searchTerm && featuredContentList.length > 0 && (
-          <div className="relative mb-8 md:mb-12 section-fade">
+          <div className="relative mb-4 md:mb-6 section-fade">
             <HeroCarousel items={featuredContentList} />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none"></div>
           </div>
         )}
         {!searchTerm && featuredContentList.length === 0 && (
-          <div className="text-center py-12 md:py-20 bg-gradient-to-r from-slate-800/40 to-slate-900/40 rounded-3xl mx-4 md:mx-6 mb-8 md:mb-12 border border-slate-700/30 section-fade">
+          <div className="text-center py-8 md:py-16 bg-gradient-to-r from-slate-800/40 to-slate-900/40 rounded-3xl mx-4 md:mx-6 mb-4 md:mb-6 border border-slate-700/30 section-fade">
             <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl mx-auto mb-6 flex items-center justify-center">
               <Play className="w-8 h-8 text-white" />
             </div>
@@ -569,40 +569,40 @@ export default function HomePage() {
        {/* Content Sections */}
        {searchTerm ? (
         filteredContent.length > 0 ? (
-          <div className="max-w-7xl mx-auto px-6 section-fade">
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4 py-5">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 section-fade">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 md:gap-3 py-4 md:py-6">
               {filteredContent.map((item) => (
                 <ContentCard key={item._id} content={item} />
               ))}
             </div>
           </div>
         ) : (
-          <div className="text-center py-24 text-gray-400 text-xl">No results found for "{searchTerm}"</div>
+          <div className="text-center py-16 md:py-24 text-gray-400 text-lg md:text-xl px-4">No results found for "{searchTerm}"</div>
         )
       ) : (
-        <div className="relative z-10 space-y-118 pb-16">
+        <div className="relative z-10 space-y-4 md:space-y-6 pb-8">
                     {trendingNow.length > 0 && (
-            <div className="space-y-2 section-fade">
-              <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
-                <div className="flex items-center space-x-4">
-                  <div className="w-1 h-8 bg-gradient-to-b from-red-500 to-pink-500 rounded-full"></div>
+            <div className="space-y-4 md:space-y-6 section-fade">
+              <div className="flex items-center justify-between px-3 sm:px-4 md:px-6 max-w-7xl mx-auto">
+                <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-4">
+                  <div className="w-0.5 sm:w-1 h-5 sm:h-6 md:h-8 bg-gradient-to-b from-red-500 to-pink-500 rounded-full"></div>
                   <div>
-                    <h2 className="text-3xl font-bold text-white tracking-wide">Top 10 Trending Now</h2>
-                    <p className="text-gray-400 text-sm mt-1">Most watched this week</p>
+                    <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-wide leading-tight">Top 10 Trending Now</h2>
+                    <p className="text-gray-400 text-[10px] sm:text-xs md:text-sm mt-0.5 sm:mt-1">Most watched this week</p>
                   </div>
                 </div>
               </div>
     <div className="relative max-w-7xl mx-auto">
       <button
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
         onClick={() => scrollGrid('trending-grid', 'left')}
         aria-label="Scroll left"
       >
-        <ChevronLeft className="w-6 h-6" />
+        <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
       </button>
-                      <div id="trending-grid" className="overflow-x-auto flex gap-3 px-10 pb-6 scrollbar-hide">
+                      <div id="trending-grid" className="overflow-x-auto flex gap-2 md:gap-3 px-8 md:px-10 pb-4 md:pb-6 scrollbar-hide">
                   {trendingNow.map((item, index) => (
-                    <div key={item._id} className="min-w-[200px] max-w-[220px] flex-shrink-0 relative group/trending">
+                    <div key={item._id} className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] lg:min-w-[200px] max-w-[140px] sm:max-w-[160px] md:max-w-[180px] lg:max-w-[200px] flex-shrink-0 relative group/trending">
                       <div className="relative z-0 transition-transform duration-300 group-hover/trending:scale-105">
                         <ContentCard content={item} />
                       </div>
@@ -611,162 +611,162 @@ export default function HomePage() {
                   ))}
       </div>
       <button
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
         onClick={() => scrollGrid('trending-grid', 'right')}
         aria-label="Scroll right"
       >
-        <ChevronRight className="w-6 h-6" />
+        <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
       </button>
     </div>
   </div>
 )}
 
           {popularMovies.length > 0 && (
-            <div className="space-y-2 section-fade">
-              <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
-                <div className="flex items-center space-x-4">
-                  <div className="w-1 h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></div>
-                  <h2 className="text-3xl font-bold text-white tracking-wide">Popular Movies</h2>
+            <div className="space-y-4 md:space-y-6 section-fade">
+              <div className="flex items-center justify-between px-4 md:px-6 max-w-7xl mx-auto">
+                <div className="flex items-center space-x-3 md:space-x-4">
+                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-amber-500 to-orange-500 rounded-full"></div>
+                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-wide">Popular Movies</h2>
                 </div>
-                <button className="text-amber-400 hover:text-amber-300 font-semibold text-sm flex items-center transition-colors group">
+                <button className="text-amber-400 hover:text-amber-300 font-semibold text-xs md:text-sm flex items-center transition-colors group">
                   View All
-                  <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
               <div className="relative max-w-7xl mx-auto">
                 <button
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
                   onClick={() => scrollGrid('popular-grid', 'left')}
                   aria-label="Scroll left"
                 >
-                  <ChevronLeft className="w-6 h-6" />
+                  <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
                 </button>
-                <div id="popular-grid" className="overflow-x-auto flex gap-4 px-10 pb-3 scrollbar-hide">
+                <div id="popular-grid" className="overflow-x-auto flex gap-2 md:gap-3 lg:gap-4 px-8 md:px-10 pb-3 md:pb-4 scrollbar-hide">
                   {popularMovies.map((item) => (
-                    <div className="min-w-[240px] max-w-[260px] flex-shrink-0" key={item._id}>
+                    <div className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] lg:min-w-[200px] max-w-[140px] sm:max-w-[160px] md:max-w-[180px] lg:max-w-[200px] flex-shrink-0" key={item._id}>
                       <ContentCard content={item} />
                     </div>
                   ))}
                 </div>
                 <button
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
                   onClick={() => scrollGrid('popular-grid', 'right')}
                   aria-label="Scroll right"
                 >
-                  <ChevronRight className="w-6 h-6" />
+                  <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
                 </button>
               </div>
             </div>
           )}
 
           {topSeries.length > 0 && (
-            <div className="space-y-2 section-fade">
-              <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
-                <div className="flex items-center space-x-4">
-                  <div className="w-1 h-8 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full"></div>
-                  <h2 className="text-3xl font-bold text-white tracking-wide">Top TV Shows</h2>
+            <div className="space-y-4 md:space-y-6 section-fade">
+              <div className="flex items-center justify-between px-4 md:px-6 max-w-7xl mx-auto">
+                <div className="flex items-center space-x-3 md:space-x-4">
+                  <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-emerald-500 to-teal-500 rounded-full"></div>
+                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-wide">Top TV Shows</h2>
                 </div>
-                <button className="text-emerald-400 hover:text-emerald-300 font-semibold text-sm flex items-center transition-colors group">
+                <button className="text-emerald-400 hover:text-emerald-300 font-semibold text-xs md:text-sm flex items-center transition-colors group">
                   View All
-                  <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  <ChevronRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </div>
               <div className="relative max-w-7xl mx-auto">
                 <button
-                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+                  className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
                   onClick={() => scrollGrid('topseries-grid', 'left')}
                   aria-label="Scroll left"
                 >
-                  <ChevronLeft className="w-6 h-6" />
+                  <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
                 </button>
-                <div id="topseries-grid" className="overflow-x-auto flex gap-4 px-10 pb-3 scrollbar-hide">
+                <div id="topseries-grid" className="overflow-x-auto flex gap-2 md:gap-3 lg:gap-4 px-8 md:px-10 pb-3 md:pb-4 scrollbar-hide">
                   {topSeries.map((item) => (
-                    <div className="min-w-[240px] max-w-[260px] flex-shrink-0" key={item._id}>
+                    <div className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] lg:min-w-[200px] max-w-[140px] sm:max-w-[160px] md:max-w-[180px] lg:max-w-[200px] flex-shrink-0" key={item._id}>
                       <ContentCard content={item} />
                     </div>
                   ))}
                 </div>
                 <button
-                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+                  className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
                   onClick={() => scrollGrid('topseries-grid', 'right')}
                   aria-label="Scroll right"
                 >
-                  <ChevronRight className="w-6 h-6" />
+                  <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
                 </button>
               </div>
             </div>
           )}
 
           {/* Action Movies */}
-          <div className="space-y-4 section-fade">
-            <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
-              <div className="flex items-center space-x-4">
-                <div className="w-1 h-8 bg-gradient-to-b from-red-500 to-pink-500 rounded-full"></div>
-                <h2 className="text-3xl font-bold text-white tracking-wide">Action Movies</h2>
+          <div className="space-y-4 md:space-y-6 section-fade">
+            <div className="flex items-center justify-between px-4 md:px-6 max-w-7xl mx-auto">
+              <div className="flex items-center space-x-3 md:space-x-4">
+                <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-red-500 to-pink-500 rounded-full"></div>
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-wide">Action Movies</h2>
               </div>
-              <button className="text-red-400 hover:text-red-300 font-semibold text-sm flex items-center transition-colors group">
+              <button className="text-red-400 hover:text-red-300 font-semibold text-xs md:text-sm flex items-center transition-colors group">
                 View All
-                <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
             <div className="relative max-w-7xl mx-auto">
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
                 onClick={() => scrollGrid('action-grid', 'left')}
                 aria-label="Scroll left"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
               </button>
-              <div id="action-grid" className="overflow-x-auto flex gap-4 px-10 pb-3 scrollbar-hide">
+              <div id="action-grid" className="overflow-x-auto flex gap-2 md:gap-3 lg:gap-4 px-8 md:px-10 pb-3 md:pb-4 scrollbar-hide">
                 {filteredContent.filter((c) => c.genre && Array.isArray(c.genre) && c.genre.includes("Action")).map((item) => (
-                  <div className="min-w-[240px] max-w-[260px] flex-shrink-0" key={item._id}>
+                  <div className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] lg:min-w-[200px] max-w-[140px] sm:max-w-[160px] md:max-w-[180px] lg:max-w-[200px] flex-shrink-0" key={item._id}>
                     <ContentCard content={item} />
                   </div>
                 ))}
               </div>
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
                 onClick={() => scrollGrid('action-grid', 'right')}
                 aria-label="Scroll right"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
               </button>
             </div>
           </div>
 
           {/* Drama Series */}
-          <div className="space-y-4 section-fade">
-            <div className="flex items-center justify-between px-6 max-w-7xl mx-auto">
-              <div className="flex items-center space-x-4">
-                <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></div>
-                <h2 className="text-3xl font-bold text-white tracking-wide">Drama Series</h2>
+          <div className="space-y-4 md:space-y-6 section-fade">
+            <div className="flex items-center justify-between px-4 md:px-6 max-w-7xl mx-auto">
+              <div className="flex items-center space-x-3 md:space-x-4">
+                <div className="w-1 h-6 md:h-8 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-full"></div>
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold text-white tracking-wide">Drama Series</h2>
               </div>
-              <button className="text-blue-400 hover:text-blue-300 font-semibold text-sm flex items-center transition-colors group">
+              <button className="text-blue-400 hover:text-blue-300 font-semibold text-xs md:text-sm flex items-center transition-colors group">
                 View All
-                <ChevronRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="ml-1 md:ml-2 w-3 h-3 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
             <div className="relative max-w-7xl mx-auto">
               <button
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+                className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
                 onClick={() => scrollGrid('drama-grid', 'left')}
                 aria-label="Scroll left"
               >
-                <ChevronLeft className="w-6 h-6" />
+                <ChevronLeft className="w-4 h-4 md:w-6 md:h-6" />
               </button>
-              <div id="drama-grid" className="overflow-x-auto flex gap-4 px-10 pb-3 scrollbar-hide">
+              <div id="drama-grid" className="overflow-x-auto flex gap-2 md:gap-3 lg:gap-4 px-8 md:px-10 pb-3 md:pb-4 scrollbar-hide">
                 {filteredContent.filter((c) => c.genre && Array.isArray(c.genre) && c.genre.includes("Drama") && c.type === "series").map((item) => (
-                  <div className="min-w-[240px] max-w-[260px] flex-shrink-0" key={item._id}>
+                  <div className="min-w-[140px] sm:min-w-[160px] md:min-w-[180px] lg:min-w-[200px] max-w-[140px] sm:max-w-[160px] md:max-w-[180px] lg:max-w-[200px] flex-shrink-0" key={item._id}>
                     <ContentCard content={item} />
                   </div>
                 ))}
               </div>
               <button
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-4 transition-all duration-300 backdrop-blur-sm"
+                className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-black/70 hover:bg-black/90 text-white border border-white/20 shadow-2xl rounded-full p-2 md:p-4 transition-all duration-300 backdrop-blur-sm"
                 onClick={() => scrollGrid('drama-grid', 'right')}
                 aria-label="Scroll right"
               >
-                <ChevronRight className="w-6 h-6" />
+                <ChevronRight className="w-4 h-4 md:w-6 md:h-6" />
               </button>
             </div>
           </div>

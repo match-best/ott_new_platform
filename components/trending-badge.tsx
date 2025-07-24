@@ -7,16 +7,23 @@ interface TrendingBadgeProps {
 
 export function TrendingBadge({ number, className = '' }: TrendingBadgeProps) {
   return (
-    <div className={`absolute -left-4 bottom-16 z-20 pointer-events-none select-none ${className}`}>
+    <div className={`absolute top-1 left-1 sm:top-2 sm:left-2 z-20 pointer-events-none select-none ${className}`}>
       <span 
         className="text-white font-black leading-none"
         style={{
-          fontSize: number > 9 ? '6rem' : '7rem',
-          WebkitTextStroke: '3px #000',
-          textShadow: '0 0 20px rgba(0,0,0,0.8)',
+          fontSize: number > 9 ? '2.2rem' : '2.8rem',
+          WebkitTextStroke: '2px #000000',
+          textShadow: `
+            -2px -2px 0 #000,
+            2px -2px 0 #000,
+            -2px 2px 0 #000,
+            2px 2px 0 #000,
+            0 0 8px rgba(0,0,0,0.8)
+          `,
           fontFamily: 'system-ui, -apple-system, sans-serif',
           fontWeight: 900,
-          letterSpacing: '-0.05em'
+          letterSpacing: '-0.03em',
+          color: '#ffffff'
         }}
       >
         {number}

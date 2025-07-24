@@ -74,55 +74,61 @@ export function AIAvatar({ onSearchContent }: AIAvatarProps) {
   useEffect(() => {
     if (!isOpen && typeof window !== 'undefined' && ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
       let isActive = true
-      let retryCount = 0
-      const maxRetries = 3
+      let restartAttempts = 0
+      const maxRestarts = 10
       
       const startWakeWordListening = () => {
-        if (!isActive || isOpen) return
+        if (!isActive || isOpen || restartAttempts >= maxRestarts) return
         
         try {
           const SpeechRecognition = (window as any).webkitSpeechRecognition || (window as any).SpeechRecognition
           const wakeRecognition = new SpeechRecognition()
+          
+          // Optimized settings for better wake word detection
           wakeRecognition.continuous = true
           wakeRecognition.interimResults = true
           wakeRecognition.lang = 'en-US'
-          wakeRecognition.maxAlternatives = 3
+          wakeRecognition.maxAlternatives = 5
           
           wakeRecognition.onstart = () => {
-            console.log('🎙️ Wake word listening started')
+            console.log('🎙️ Wake word listening started (attempt', restartAttempts + 1, ')')
             setIsWakeWordActive(true)
-            retryCount = 0
           }
           
           wakeRecognition.onresult = (event: any) => {
             for (let i = event.resultIndex; i < event.results.length; i++) {
-              const result = event.results[i]
-              if (result.isFinal || result[0].confidence > 0.5) {
-                const transcript = result[0].transcript.toLowerCase().trim()
-                console.log('🔍 Wake word check:', transcript, 'Confidence:', result[0].confidence)
+              for (let j = 0; j < event.results[i].length; j++) {
+                const transcript = event.results[i][j].transcript.toLowerCase().trim()
+                const confidence = event.results[i][j].confidence
                 
-                // More flexible wake word detection
-                const wakeWords = [
-                  'hi ava', 'hey ava', 'hello ava', 
-                  'ava', 'hi eva', 'hey eva',
-                  'ok ava', 'ava help'
+                console.log('🔍 Wake word check:', transcript, 'Confidence:', confidence)
+                
+                // Comprehensive wake word patterns
+                const wakePatterns = [
+                  /\bhi\s*ava\b/i,
+                  /\bhey\s*ava\b/i,
+                  /\bhello\s*ava\b/i,
+                  /\bava\b/i,
+                  /\bhi\s*eva\b/i,
+                  /\bhey\s*eva\b/i,
+                  /\bok\s*ava\b/i,
+                  /\bava\s*help\b/i
                 ]
                 
-                const isWakeWordDetected = wakeWords.some(word => 
-                  transcript.includes(word) || 
-                  transcript.replace(/[^a-z\s]/g, '').includes(word)
+                const isWakeWordDetected = wakePatterns.some(pattern => 
+                  pattern.test(transcript)
                 )
                 
-                if (isWakeWordDetected) {
-                  console.log('🚀 Wake word detected!', transcript)
+                if (isWakeWordDetected && (confidence > 0.3 || event.results[i].isFinal)) {
+                  console.log('🚀 Wake word detected!', transcript, 'Confidence:', confidence)
                   wakeRecognition.stop()
                   setIsWakeWordActive(false)
                   setIsOpen(true)
                   
-                  // Add a small delay for smoother transition
+                  // Start main speech recognition
                   setTimeout(() => {
                     startListening()
-                  }, 800)
+                  }, 500)
                   return
                 }
               }
@@ -133,10 +139,13 @@ export function AIAvatar({ onSearchContent }: AIAvatarProps) {
             console.log('❌ Wake word error:', event.error)
             setIsWakeWordActive(false)
             
-            if (isActive && !isOpen && retryCount < maxRetries) {
-              retryCount++
-              console.log(`🔄 Retrying wake word detection (${retryCount}/${maxRetries})`)
-              setTimeout(startWakeWordListening, 2000 * retryCount)
+            // Auto-restart on most errors
+            if (isActive && !isOpen && restartAttempts < maxRestarts) {
+              if (event.error !== 'not-allowed' && event.error !== 'service-not-allowed') {
+                restartAttempts++
+                console.log(`🔄 Auto-restarting wake word detection (${restartAttempts}/${maxRestarts})`)
+                setTimeout(startWakeWordListening, 1000)
+              }
             }
           }
           
@@ -144,9 +153,11 @@ export function AIAvatar({ onSearchContent }: AIAvatarProps) {
             console.log('⏹️ Wake word listening ended')
             setIsWakeWordActive(false)
             
-            if (isActive && !isOpen && retryCount < maxRetries) {
+            // Immediately restart if still active
+            if (isActive && !isOpen && restartAttempts < maxRestarts) {
+              restartAttempts++
               console.log('🔄 Restarting wake word detection')
-              setTimeout(startWakeWordListening, 1000)
+              setTimeout(startWakeWordListening, 500)
             }
           }
           
@@ -156,15 +167,17 @@ export function AIAvatar({ onSearchContent }: AIAvatarProps) {
         } catch (err) {
           console.log('💥 Wake word listening error:', err)
           setIsWakeWordActive(false)
-          if (isActive && !isOpen && retryCount < maxRetries) {
-            retryCount++
-            setTimeout(startWakeWordListening, 3000 * retryCount)
+          
+          // Retry after longer delay on setup errors
+          if (isActive && !isOpen && restartAttempts < maxRestarts) {
+            restartAttempts++
+            setTimeout(startWakeWordListening, 2000)
           }
         }
       }
       
-      // Start after initialization
-      const timer = setTimeout(startWakeWordListening, 1500)
+      // Start immediately
+      const timer = setTimeout(startWakeWordListening, 1000)
       
       return () => {
         isActive = false
